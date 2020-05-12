@@ -5,6 +5,8 @@ import os
 import re
 import sys
 
+output_dir = 'dist'
+
 def convert_array_presentation(line):
     if re.search(r"[:]\s*$", line): return line
     key, value = line.split(': ')
@@ -19,6 +21,9 @@ def convert_line(line):
     return line
 
 def convert(path):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     path_split = path.split('/')
     file_name = path_split.pop(-1)
 
@@ -26,7 +31,7 @@ def convert(path):
         l_strip = [s.strip() for s in f.readlines()]
         result = '\n'.join(map(convert_line, l_strip))
 
-    with open(file_name, mode = 'w') as f:
+    with open(os.path.join(output_dir, file_name), mode = 'w') as f:
         f.write(result)
 
 def handle_path(path):
@@ -37,7 +42,7 @@ def handle_path(path):
     if not os.path.isdir(path):
         return
 
-    entries = os.listdir(path)[:3] # TODO: あとで範囲を削除
+    entries = os.listdir(path)
 
     for entry in entries:
         if not re.search(r"[.]md$", entry) is None:
@@ -47,6 +52,7 @@ if __name__ == '__main__':
     args = sys.argv
     if 2 <= len(args):
         if type(args[1]) is str:
+            print('Start processing...')
             handle_path(args[1])
         else:
             print('Argument is not string')
