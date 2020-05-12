@@ -60,3 +60,4 @@ if __name__ == '__main__':
         print('Arguments are too short')
 
 # TODO: 出力先をコマンドライン引数に渡せるようにする
+# TODO: frontmatter外の処理をしない
