@@ -1,19 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
+import re
 import sys
 
-def convert_array_presentation(str):
-    key, value = str.split(': ')
+def convert_array_presentation(line):
+    if re.search(r"[:]\s*$", line): return line
+    key, value = line.split(': ')
     v_split = value.replace(' ', '').split(',')
     v_split_r = [a for a in v_split if a != '']
     result = '%s: [%s]' % (key, ', '.join(v_split_r))
     return result
 
-def convert_line(str):
-    if 'category' in str or 'tags' in str:
-        return convert_array_presentation(str)
-    return str
+def convert_line(line):
+    if 'category' in line or 'tags' in line:
+        return convert_array_presentation(line)
+    return line
 
 def convert(path):
     path_split = path.split('/')
@@ -26,15 +29,28 @@ def convert(path):
     with open(file_name, mode = 'w') as f:
         f.write(result)
 
+def handle_path(path):
+    if os.path.isfile(path):
+        convert(path)
+        return
+
+    if not os.path.isdir(path):
+        return
+
+    entries = os.listdir(path)[:3] # TODO: あとで範囲を削除
+
+    for entry in entries:
+        if not re.search(r"[.]md$", entry) is None:
+            convert(path + entry)
+
 if __name__ == '__main__':
     args = sys.argv
     if 2 <= len(args):
         if type(args[1]) is str:
-            convert(args[1])
+            handle_path(args[1])
         else:
             print('Argument is not string')
     else:
         print('Arguments are too short')
 
-# TODO: ディレクトリをよみこんで処理する
 # TODO: 出力先をコマンドライン引数に渡せるようにする
