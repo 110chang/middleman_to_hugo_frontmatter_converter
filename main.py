@@ -6,6 +6,8 @@ import re
 import sys
 
 output_dir = 'dist'
+frontmatter_sep = '---'
+sep_count = 0
 
 def convert_array_presentation(line):
     if re.search(r"[:]\s*$", line): return line
@@ -16,11 +18,16 @@ def convert_array_presentation(line):
     return result
 
 def convert_line(line):
+    global sep_count
+    if frontmatter_sep in line: sep_count += 1
+    if sep_count > 1: return line
     if 'category' in line or 'tags' in line:
         return convert_array_presentation(line)
     return line
 
 def convert(path):
+    global sep_count
+
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -28,6 +35,7 @@ def convert(path):
     file_name = path_split.pop(-1)
 
     with open(path) as f:
+        sep_count = 0
         l_strip = [s.strip() for s in f.readlines()]
         result = '\n'.join(map(convert_line, l_strip))
 
@@ -60,4 +68,3 @@ if __name__ == '__main__':
         print('Arguments are too short')
 
 # TODO: 出力先をコマンドライン引数に渡せるようにする
-# TODO: frontmatter外の処理をしない
