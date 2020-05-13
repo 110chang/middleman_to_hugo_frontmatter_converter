@@ -19,6 +19,7 @@ def convert_array_presentation(line):
 
 def convert_line(line):
     global sep_count
+    if re.search(r"^READMORE$", line): return '<!--more-->'
     if frontmatter_sep in line: sep_count += 1
     if sep_count > 1: return line
     if 'category' in line or 'tags' in line:
