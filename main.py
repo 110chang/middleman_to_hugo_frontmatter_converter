@@ -37,7 +37,7 @@ def convert(path):
 
     with open(path) as f:
         sep_count = 0
-        l_strip = [s.strip() for s in f.readlines()]
+        l_strip = [s.rstrip() for s in f.readlines()]
         result = '\n'.join(map(convert_line, l_strip))
 
     with open(os.path.join(output_dir, file_name), mode = 'w') as f:
