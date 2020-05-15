@@ -47,7 +47,6 @@ def clear_dist():
         pass
 
 def main():
-    converter = Converter()
     args = sys.argv
 
     if 2 <= len(args):

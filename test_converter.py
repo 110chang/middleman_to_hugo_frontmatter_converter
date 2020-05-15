@@ -4,6 +4,38 @@
 import unittest
 from converter import Converter
 
+FILE_ORIGINAL = '''
+---
+title: This is a entry
+category: Value,
+tags: Value, Value2,
+tags: 
+---
+
+This is a entry body
+READMORE
+This is a entry more
+tags: are, not, converted,
+<p>This is a paragraph</p>
+
+'''[1:-1]
+
+FILE_CONVERTED = '''
+---
+title: This is a entry
+category: [Value]
+tags: [Value, Value2]
+tags: 
+---
+
+This is a entry body
+<!--more-->
+This is a entry more
+tags: are, not, converted,
+<p>This is a paragraph</p>
+
+'''[1:-1]
+
 class TestConverter(unittest.TestCase):
     def setUp(self):
         self.converter = Converter()
@@ -42,6 +74,14 @@ class TestConverter(unittest.TestCase):
         expected = 'tags: should, not, be, converted,'
         self.converter.convert_line('---')
         actual = self.converter.convert_line('tags: should, not, be, converted,')
+        self.assertEqual(expected, actual)
+
+    def test_converter(self):
+        expected = FILE_CONVERTED
+        l_split = FILE_ORIGINAL.split('\n')
+        actual = self.converter.convert(l_split)
+        # print('\n')
+        # print(actual)
         self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
