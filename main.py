@@ -3,10 +3,9 @@
 
 import os
 import re
+import shutil
 import sys
 
-output_dir = 'dist'
-frontmatter_sep = '---'
 sep_count = 0
 
 def convert_array_presentation(line):
@@ -19,6 +18,8 @@ def convert_array_presentation(line):
 
 def convert_line(line):
     global sep_count
+    frontmatter_sep = '---'
+
     if re.search(r"^READMORE$", line): return '<!--more-->'
     if frontmatter_sep in line: sep_count += 1
     if sep_count > 1: return line
@@ -28,6 +29,7 @@ def convert_line(line):
 
 def convert(path):
     global sep_count
+    output_dir = 'dist'
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -57,11 +59,19 @@ def handle_path(path):
         if not re.search(r"[.]md$", entry) is None:
             convert(path + entry)
 
+def clear_dist():
+    output_dir = 'dist'
+    shutil.rmtree(output_dir)
+    os.mkdir(output_dir)
+    with open(os.path.join(output_dir, '.gitkeep'), 'w') as f:
+        pass
+
 if __name__ == '__main__':
     args = sys.argv
     if 2 <= len(args):
         if type(args[1]) is str:
             print('Start processing...')
+            clear_dist()
             handle_path(args[1])
         else:
             print('Argument is not string')
