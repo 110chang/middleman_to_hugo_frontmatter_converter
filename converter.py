@@ -1,12 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
 import re
-import shutil
 
 FRONTMATTER_SEP = '---'
-OUTPUT_DIR = 'dist'
 READ_MORE = '<!--more-->'
 
 class Converter():
@@ -36,38 +33,6 @@ class Converter():
 
         return line
 
-    def convert(self, path):
-        if not os.path.exists(OUTPUT_DIR):
-            os.makedirs(OUTPUT_DIR)
-
-        path_split = path.split('/')
-        file_name = path_split.pop(-1)
-
-        with open(path) as f:
-            self.sep_count = 0
-            l_strip = [s.rstrip() for s in f.readlines()]
-            result = '\n'.join(map(self.convert_line, l_strip))
-
-        with open(os.path.join(OUTPUT_DIR, file_name), mode = 'w') as f:
-            f.write(result)
-
-    def handle_path(self, path):
-        if os.path.isfile(path):
-            self.convert(path)
-            return
-
-        if not os.path.isdir(path):
-            return
-
-        entries = os.listdir(path)
-
-        for entry in entries:
-            if not re.search(r"[.]md$", entry) is None:
-                self.convert(path + entry)
-
-    def clear_dist(self):
-        shutil.rmtree(OUTPUT_DIR)
-        os.mkdir(OUTPUT_DIR)
-
-        with open(os.path.join(OUTPUT_DIR, '.gitkeep'), 'w') as f:
-            pass
+    def convert(self, lines):
+        self.sep_count = 0
+        return '\n'.join(map(self.convert_line, lines))
