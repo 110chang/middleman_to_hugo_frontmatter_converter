@@ -6,76 +6,88 @@ import re
 import shutil
 import sys
 
-sep_count = 0
+FRONTMATTER_SEP = '---'
+OUTPUT_DIR = 'dist'
+READ_MORE = '<!--more-->'
 
-def convert_array_presentation(line):
-    if re.search(r"[:]\s*$", line): return line
-    key, value = line.split(': ')
-    v_split = value.replace(' ', '').split(',')
-    v_split_r = [a for a in v_split if a != '']
-    result = '%s: [%s]' % (key, ', '.join(v_split_r))
-    return result
+class Converter:
+    sep_count = 0
 
-def convert_line(line):
-    global sep_count
-    frontmatter_sep = '---'
+    def convert_array_presentation(self, line):
+        if re.search(r"[:]\s*$", line):
+            return line
 
-    if re.search(r"^READMORE$", line): return '<!--more-->'
-    if frontmatter_sep in line: sep_count += 1
-    if sep_count > 1: return line
-    if 'category' in line or 'tags' in line:
-        return convert_array_presentation(line)
-    return line
+        key, value = line.split(': ')
+        v_split = value.replace(' ', '').split(',')
+        v_split_r = [a for a in v_split if a != '']
+        result = '%s: [%s]' % (key, ', '.join(v_split_r))
 
-def convert(path):
-    global sep_count
-    output_dir = 'dist'
+        return result
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    def convert_line(self, line):
+        if re.search(r"^READMORE$", line): return READ_MORE
 
-    path_split = path.split('/')
-    file_name = path_split.pop(-1)
+        if line == FRONTMATTER_SEP:
+            self.sep_count += 1
 
-    with open(path) as f:
-        sep_count = 0
-        l_strip = [s.rstrip() for s in f.readlines()]
-        result = '\n'.join(map(convert_line, l_strip))
+        if self.sep_count > 1: return line
 
-    with open(os.path.join(output_dir, file_name), mode = 'w') as f:
-        f.write(result)
+        if 'category' in line or 'tags' in line:
+            return self.convert_array_presentation(line)
 
-def handle_path(path):
-    if os.path.isfile(path):
-        convert(path)
-        return
+        return line
 
-    if not os.path.isdir(path):
-        return
+    def convert(self, path):
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
 
-    entries = os.listdir(path)
+        path_split = path.split('/')
+        file_name = path_split.pop(-1)
 
-    for entry in entries:
-        if not re.search(r"[.]md$", entry) is None:
-            convert(path + entry)
+        with open(path) as f:
+            self.sep_count = 0
+            l_strip = [s.rstrip() for s in f.readlines()]
+            result = '\n'.join(map(self.convert_line, l_strip))
 
-def clear_dist():
-    output_dir = 'dist'
-    shutil.rmtree(output_dir)
-    os.mkdir(output_dir)
-    with open(os.path.join(output_dir, '.gitkeep'), 'w') as f:
-        pass
+        with open(os.path.join(OUTPUT_DIR, file_name), mode = 'w') as f:
+            f.write(result)
 
-if __name__ == '__main__':
+    def handle_path(self, path):
+        if os.path.isfile(path):
+            self.convert(path)
+            return
+
+        if not os.path.isdir(path):
+            return
+
+        entries = os.listdir(path)
+
+        for entry in entries:
+            if not re.search(r"[.]md$", entry) is None:
+                self.convert(path + entry)
+
+    def clear_dist(self):
+        shutil.rmtree(OUTPUT_DIR)
+        os.mkdir(OUTPUT_DIR)
+
+        with open(os.path.join(OUTPUT_DIR, '.gitkeep'), 'w') as f:
+            pass
+
+def main():
+    converter = Converter()
     args = sys.argv
+
     if 2 <= len(args):
         if type(args[1]) is str:
             print('Start processing...')
-            clear_dist()
-            handle_path(args[1])
+            converter.clear_dist()
+            converter.handle_path(args[1])
         else:
             print('Argument is not string')
     else:
         print('Arguments are too short')
+
+if __name__ == '__main__':
+    main()
 
 # TODO: 出力先をコマンドライン引数に渡せるようにする
