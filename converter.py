@@ -16,19 +16,22 @@ class Converter():
         key, value = line.split(': ')
         v_split = value.replace(' ', '').split(',')
         v_split_r = [a for a in v_split if a != '']
+
+        if (key == 'category'): key = 'categories'
+
         result = '%s: [%s]' % (key, ', '.join(v_split_r))
 
         return result
 
     def convert_line(self, line):
         if line == 'READMORE': return READ_MORE
-
-        if line == FRONTMATTER_SEP:
-            self.sep_count += 1
-
+        if line == FRONTMATTER_SEP: self.sep_count += 1
         if self.sep_count > 1: return line
 
-        if 'category' in line or 'tags' in line:
+        if 'category' in line:
+            return self.convert_array_presentation(line)
+
+        if 'tags' in line:
             return self.convert_array_presentation(line)
 
         return line

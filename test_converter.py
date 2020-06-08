@@ -16,6 +16,7 @@ This is a entry body
 READMORE
 This is a entry more
 tags: are, not, converted,
+category: are, not, converted,
 <p>This is a paragraph</p>
 
 '''[1:-1]
@@ -23,7 +24,7 @@ tags: are, not, converted,
 FILE_CONVERTED = '''
 ---
 title: This is a entry
-category: [Value]
+categories: [Value]
 tags: [Value, Value2]
 tags: 
 ---
@@ -32,6 +33,7 @@ This is a entry body
 <!--more-->
 This is a entry more
 tags: are, not, converted,
+category: are, not, converted,
 <p>This is a paragraph</p>
 
 '''[1:-1]
@@ -56,7 +58,7 @@ class TestConverter(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_convert_line_to_categories(self):
-        expected = 'category: [value]'
+        expected = 'categories: [value]'
         actual = self.converter.convert_line('category: value,')
         self.assertEqual(expected, actual)
 
