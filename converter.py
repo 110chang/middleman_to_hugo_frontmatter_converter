@@ -6,8 +6,10 @@ import re
 FRONTMATTER_SEP = '---'
 READ_MORE = '<!--more-->'
 
-class Converter():
-    sep_count = 0
+class Converter:
+    def __init__(self):
+        self.sep_count = 0
+        self.category = ''
 
     def convert_array_presentation(self, line):
         if re.search(r"[:]\s*$", line):
@@ -17,7 +19,9 @@ class Converter():
         v_split = value.replace(' ', '').split(',')
         v_split_r = [a for a in v_split if a != '']
 
-        if (key == 'category'): key = 'categories'
+        if (key == 'category'):
+            key = 'categories'
+            self.category = v_split_r.pop()
 
         result = '%s: [%s]' % (key, ', '.join(v_split_r))
 
@@ -36,6 +40,11 @@ class Converter():
 
         return line
 
+    def insert_alias(self, file_name):
+        new_name = re.sub(r"^\d{4}[-]\d{2}[-]\d{2}[-]", '', file_name)
+        # print(new_name)
+
     def convert(self, lines):
         self.sep_count = 0
-        return '\n'.join(map(self.convert_line, lines))
+        line_arr = map(self.convert_line, lines)
+        return '\n'.join(line_arr)
