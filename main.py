@@ -20,7 +20,7 @@ def handle_file(path):
 
     with open(path) as f:
         l_strip = [s.rstrip() for s in f.readlines()]
-        result = converter.convert(l_strip)
+        result = converter.convert(l_strip, file_name)
 
     with open(os.path.join(OUTPUT_DIR, file_name), mode = 'w') as f:
         f.write(result)

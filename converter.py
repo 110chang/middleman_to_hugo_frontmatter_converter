@@ -40,11 +40,22 @@ class Converter:
 
         return line
 
-    def insert_alias(self, file_name):
+    def insert_alias(self, line_arr, file_name):
         new_name = re.sub(r"^\d{4}[-]\d{2}[-]\d{2}[-]", '', file_name)
-        # print(new_name)
+        new_name = re.sub(r"[.]md$", '', new_name)
+        new_name = re.sub(r"[.]html$", '', new_name)
+        sep_indexes = [i for i, x in enumerate(line_arr) if x == '---']
+        second_sep_index = sep_indexes[1]
+        if (self.category):
+            line_arr.insert(second_sep_index, '  - /%s/%s' % (self.category.lower(), new_name))
+        else:
+            line_arr.insert(second_sep_index, '  - /%s' % new_name)
+        line_arr.insert(second_sep_index, 'aliases:')
 
-    def convert(self, lines):
+        return line_arr
+
+    def convert(self, lines, file_name):
         self.sep_count = 0
         line_arr = map(self.convert_line, lines)
+        line_arr = self.insert_alias(line_arr, file_name)
         return '\n'.join(line_arr)
