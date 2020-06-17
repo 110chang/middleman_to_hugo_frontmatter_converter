@@ -27,6 +27,17 @@ class Converter:
 
         return result
 
+    def convert_date_format(self, line):
+        # print(line)
+        matched = re.match(r"^date[:]\s(\d{4}[-]\d{2}[-]\d{2})\s(\d{2}[:]\d{2}[:]\d{2})", line)
+        if matched:
+            # print(matched.group(1) + 'T' + matched.group(2) + '+09:00')
+            return 'date: ' + matched.group(1) + 'T' + matched.group(2) + '+09:00'
+        matched2 = re.match(r"^date[:]\s(\d{4}[-]\d{2}[-]\d{2})\s(\d{2}[:]\d{2}) UTC", line)
+        if matched2:
+            # print(matched2.group(1) + 'T' + matched2.group(2) + ':00+09:00')
+            return 'date: ' + matched2.group(1) + 'T' + matched2.group(2) + ':00+09:00'
+
     def convert_line(self, line):
         if line == 'READMORE': return READ_MORE
         if line == FRONTMATTER_SEP: self.sep_count += 1
@@ -37,6 +48,9 @@ class Converter:
 
         if 'tags' in line:
             return self.convert_array_presentation(line)
+
+        if 'date' in line:
+            return self.convert_date_format(line)
 
         return line
 
