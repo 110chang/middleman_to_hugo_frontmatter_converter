@@ -41,8 +41,12 @@ class Converter:
     def convert_ficker_link(self, line):
         return re.sub(r'http:\/\/(farm\d\.static\.?flickr\.com\/[0-9a-zA-Z-_./]+)', r'https://\1', line)
 
+    def convert_amazon_link(self, line):
+        return re.sub(r'http:\/\/(rcm-jp\.amazon\.co\.jp\/[0-9a-zA-Z-=_./&?;]+)', r'https://\1', line)
+
     def convert_line(self, line):
         line = self.convert_ficker_link(line)
+        line = self.convert_amazon_link(line)
 
         if line == 'READMORE': return READ_MORE
         if line == FRONTMATTER_SEP: self.sep_count += 1
