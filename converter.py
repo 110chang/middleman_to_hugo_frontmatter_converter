@@ -38,7 +38,12 @@ class Converter:
             # print(matched2.group(1) + 'T' + matched2.group(2) + ':00+09:00')
             return 'date: ' + matched2.group(1) + 'T' + matched2.group(2) + ':00+09:00'
 
+    def convert_ficker_link(self, line):
+        return re.sub(r'http:\/\/(farm\d\.static\.?flickr\.com\/[0-9a-zA-Z-_./]+)', r'https://\1', line)
+
     def convert_line(self, line):
+        line = self.convert_ficker_link(line)
+
         if line == 'READMORE': return READ_MORE
         if line == FRONTMATTER_SEP: self.sep_count += 1
         if self.sep_count > 1: return line
