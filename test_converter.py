@@ -4,9 +4,12 @@
 import unittest
 from converter import Converter
 
+FILE_NAME = '2020-01-23-file-name-of-article.html.md'
+
 FILE_ORIGINAL = '''
 ---
 title: This is a entry
+date: 2020-01-23 12:34:56
 category: Value,
 tags: Value, Value2,
 tags: 
@@ -24,9 +27,12 @@ category: are, not, converted,
 FILE_CONVERTED = '''
 ---
 title: This is a entry
+date: 2020-01-23T12:34:56+09:00
 categories: [Value]
 tags: [Value, Value2]
 tags: 
+aliases:
+  - /value/file-name-of-article
 ---
 
 This is a entry body
@@ -50,6 +56,16 @@ class TestConverter(unittest.TestCase):
     def test_convert_array_presentation_to_empty_value(self):
         expected = 'key: '
         actual = self.converter.convert_array_presentation('key: ')
+        self.assertEqual(expected, actual)
+
+    def test_convert_date_format(self):
+        expected = 'date: 2020-01-23T12:34:56+09:00'
+        actual = self.converter.convert_date_format('date: 2020-01-23 12:34:56')
+        self.assertEqual(expected, actual)
+
+    def test_convert_another_date_format(self):
+        expected = 'date: 2020-01-23T12:34:00+09:00'
+        actual = self.converter.convert_date_format('date: 2020-01-23 12:34 UTC')
         self.assertEqual(expected, actual)
 
     def test_convert_line_to_readmore(self):
@@ -81,7 +97,7 @@ class TestConverter(unittest.TestCase):
     def test_converter(self):
         expected = FILE_CONVERTED
         l_split = FILE_ORIGINAL.split('\n')
-        actual = self.converter.convert(l_split)
+        actual = self.converter.convert(l_split, FILE_NAME)
         # print('\n')
         # print(actual)
         self.assertEqual(expected, actual)

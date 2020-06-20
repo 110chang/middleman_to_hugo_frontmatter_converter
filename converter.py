@@ -21,7 +21,7 @@ class Converter:
 
         if (key == 'category'):
             key = 'categories'
-            self.category = v_split_r.pop()
+            self.category = v_split_r[0]
 
         result = '%s: [%s]' % (key, ', '.join(v_split_r))
 
